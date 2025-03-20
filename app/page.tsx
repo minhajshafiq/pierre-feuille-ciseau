@@ -1,103 +1,348 @@
-import Image from "next/image";
+"use client"
+import {useState} from 'react';
+import {FaHandRock, FaHandPaper, FaHandScissors, FaRedo, FaRobot, FaUser} from 'react-icons/fa';
+import {motion, AnimatePresence} from 'motion/react';
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+export default function PierreFeuilleCiseaux() {
+    const [playerName, setPlayerName] = useState("");
+    const [playerChoice, setPlayerChoice] = useState<string | null>(null);
+    const [opponentChoice, setOpponentChoice] = useState<string | null>(null);
+    const [result, setResult] = useState("");
+    const [isNameSet, setIsNameSet] = useState(false);
+    const [playerScore, setPlayerScore] = useState(0);
+    const [opponentScore, setOpponentScore] = useState(0);
+    const [winningIcon, setWinningIcon] = useState<string | null>(null);
+    const [winner, setWinner] = useState<"player" | "robot" | "tie" | null>(null);
+    const [showBounce, setShowBounce] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    const setName = () => {
+        if (playerName.trim() !== "") {
+            setIsNameSet(true);
+        }
+    };
+
+    const resetScores = () => {
+        setPlayerScore(0);
+        setOpponentScore(0);
+        setWinningIcon(null);
+        setWinner(null);
+    };
+
+    const getIcon = (choice: string, size = 32) => {
+        switch (choice) {
+            case "Pierre":
+                return <FaHandRock size={size}/>;
+            case "Feuille":
+                return <FaHandPaper size={size}/>;
+            case "Ciseaux":
+                return <FaHandScissors size={size}/>;
+            default:
+                return null;
+        }
+    };
+
+    const play = (choice: string) => {
+        setShowBounce(true);
+        setPlayerChoice(choice);
+        setWinningIcon(null);
+        setWinner(null);
+        setResult("");
+
+        const options = ["Pierre", "Feuille", "Ciseaux"];
+        const botChoice = options[Math.floor(Math.random() * options.length)];
+        setOpponentChoice(botChoice);
+
+        let gameResult = "";
+        if (choice === botChoice) {
+            gameResult = "Égalité";
+            setTimeout(() => {
+                setWinningIcon("egalite");
+                setWinner("tie");
+                setTimeout(() => setResult(gameResult), 500);
+            }, 1500);
+        } else if (
+            (choice === "Pierre" && botChoice === "Ciseaux") ||
+            (choice === "Feuille" && botChoice === "Pierre") ||
+            (choice === "Ciseaux" && botChoice === "Feuille")
+        ) {
+            gameResult = "Vous avez gagné !!";
+            setTimeout(() => {
+                setWinningIcon(choice);
+                setWinner("player");
+                setPlayerScore(prevScore => prevScore + 1);
+                setTimeout(() => setResult(gameResult), 500);
+            }, 1500);
+        } else {
+            gameResult = "Vous avez perdu !!";
+            setTimeout(() => {
+                setWinningIcon(botChoice);
+                setWinner("robot");
+                setOpponentScore(prevScore => prevScore + 1);
+                setTimeout(() => setResult(gameResult), 500);
+            }, 1500);
+        }
+
+        setTimeout(() => setShowBounce(false), 2000);
+    };
+
+    return (
+        <div className="min-h-screen w-full flex justify-center items-center">
+            <AnimatePresence mode="wait">
+                {!isNameSet ? (
+                    <motion.div
+                        key="login"
+                        className="p-8 flex flex-col items-center bg-white text-black rounded-lg shadow-lg max-w-md w-full"
+                        initial={{opacity: 0, y: 20}}
+                        animate={{opacity: 1, y: 0}}
+                        exit={{opacity: 0, y: -20}}
+                        transition={{duration: 0.5}}
+                    >
+                        <motion.h1
+                            className="text-4xl mb-6 font-bold text-center"
+                            initial={{scale: 0.8}}
+                            animate={{scale: 1}}
+                            transition={{duration: 0.5}}
+                        >
+                            Pierre, Feuille, Ciseaux
+                        </motion.h1>
+                        <motion.input
+                            type="text"
+                            placeholder="Entre ton pseudo"
+                            value={playerName}
+                            onChange={(e) => setPlayerName(e.target.value)}
+                            className="border p-2 mb-4 w-64 text-center rounded"
+                            whileFocus={{scale: 1.05}}
+                            transition={{duration: 0.2}}
+                        />
+                        <motion.button
+                            onClick={setName}
+                            className="bg-blue-500 text-white p-2 rounded w-64"
+                            whileHover={{scale: 1.05}}
+                            whileTap={{scale: 0.95}}
+                        >
+                            Valider
+                        </motion.button>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="game"
+                        className="p-8 flex flex-col items-center bg-white text-black rounded-lg shadow-lg max-w-md w-full"
+                        initial={{opacity: 0, y: 20}}
+                        animate={{opacity: 1, y: 0}}
+                        exit={{opacity: 0, y: -20}}
+                        transition={{duration: 0.5}}
+                    >
+                        <motion.h1
+                            className="text-4xl mb-6 font-bold text-center"
+                            initial={{scale: 0.8}}
+                            animate={{scale: 1}}
+                            transition={{duration: 0.5}}
+                        >
+                            Game : VS IA
+                        </motion.h1>
+
+                        <motion.div
+                            className="mb-6 flex gap-6 justify-center"
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            transition={{delay: 0.3, staggerChildren: 0.1}}
+                        >
+                            <motion.button
+                                onClick={() => play("Pierre")}
+                                className="bg-purple-500 text-white p-4 rounded-full"
+                                whileHover={{scale: 1.1, rotate: 5}}
+                                whileTap={{scale: 0.9}}
+                            >
+                                <FaHandRock size={32}/>
+                            </motion.button>
+                            <motion.button
+                                onClick={() => play("Feuille")}
+                                className="bg-purple-500 text-white p-4 rounded-full"
+                                whileHover={{scale: 1.1, rotate: -5}}
+                                whileTap={{scale: 0.9}}
+                            >
+                                <FaHandPaper size={32}/>
+                            </motion.button>
+                            <motion.button
+                                onClick={() => play("Ciseaux")}
+                                className="bg-purple-500 text-white p-4 rounded-full"
+                                whileHover={{scale: 1.1, rotate: 5}}
+                                whileTap={{scale: 0.9}}
+                            >
+                                <FaHandScissors size={32}/>
+                            </motion.button>
+                        </motion.div>
+
+                        <motion.div className="relative h-32 w-full mb-6">
+                            {playerChoice && opponentChoice && (
+                                <>
+                                    {/* Animation Joueur */}
+                                    <motion.div
+                                        className="absolute left-1/4 transform -translate-x-1/2 bg-blue-500 text-white p-3 rounded-full"
+                                        initial={{y: -50}}
+                                        animate={showBounce ?
+                                            {y: [-20, 0, -15, 0, -10, 0], transition: {duration: 1.5}} :
+                                            {y: 0}
+                                        }
+                                    >
+                                        {getIcon(playerChoice)}
+                                    </motion.div>
+
+                                    {/* Animation Robot */}
+                                    <motion.div
+                                        className="absolute left-3/4 transform -translate-x-1/2 bg-red-500 text-white p-3 rounded-full"
+                                        initial={{y: -50}}
+                                        animate={showBounce ?
+                                            {y: [-20, 0, -15, 0, -10, 0], transition: {duration: 1.5}} :
+                                            {y: 0}
+                                        }
+                                    >
+                                        {getIcon(opponentChoice)}
+                                    </motion.div>
+
+                                    {/* Animation Gagnant */}
+                                    <AnimatePresence>
+                                        {winningIcon && winningIcon !== "egalite" && (
+                                            <motion.div
+                                                className="absolute left-1/2 transform -translate-x-1/2 top-0 bg-green-500 text-white p-4 rounded-full z-10"
+                                                initial={{y: -50, opacity: 0}}
+                                                animate={{y: 100, opacity: 1}}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 100,
+                                                    damping: 5,
+                                                    duration: 1
+                                                }}
+                                            >
+                                                {getIcon(winningIcon, 40)}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Animation character */}
+                                    <AnimatePresence>
+                                        {winner && (
+                                            <motion.div
+                                                className={`absolute ${winner === "player" ? "left-1/4" : winner === "robot" ? "left-3/4" : "left-1/2"} transform -translate-x-1/2 -top-10`}
+                                                initial={{scale: 0, opacity: 0}}
+                                                animate={{scale: 1, opacity: 1}}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 260,
+                                                    damping: 20,
+                                                    delay: winner !== "tie" ? 0.8 : 0.6
+                                                }}
+                                            >
+                                                <div className={`p-2 rounded-full ${
+                                                    winner === "player" ? "bg-blue-600" :
+                                                        winner === "robot" ? "bg-red-600" :
+                                                            "bg-yellow-600"
+                                                } text-white`}>
+                                                    {winner === "player" ? (
+                                                        <FaUser size={24}/>
+                                                    ) : winner === "robot" ? (
+                                                        <FaRobot size={24}/>
+                                                    ) : (
+                                                        <motion.div
+                                                            animate={{rotateY: [0, 180, 0]}}
+                                                            transition={{
+                                                                repeat: Infinity,
+                                                                duration: 2,
+                                                                ease: "easeInOut"
+                                                            }}
+                                                            className="flex"
+                                                        >
+                                                            <FaUser size={24} className="mr-1"/>
+                                                            <FaRobot size={24}/>
+                                                        </motion.div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </>
+                            )}
+                        </motion.div>
+
+                        <motion.div
+                            className="mt-4 text-center w-full space-y-6"
+                            initial={{opacity: 0, y: 10}}
+                            animate={{opacity: 1, y: 0}}
+                            transition={{delay: 0.5}}
+                        >
+                            <div className="relative h-[60px]">
+                                <AnimatePresence mode="wait">
+                                    {result ? (
+                                        <motion.div
+                                            key={result}
+                                            initial={{ opacity: 0, y: -20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 20 }}
+                                            transition={{
+                                                duration: 0.3,
+                                                ease: "easeInOut"
+                                            }}
+                                            className={`
+                                                absolute w-full p-4 rounded-lg shadow-lg font-bold text-lg
+                                                ${result.includes("gagné") ? "bg-green-100 text-green-800" :
+                                                result.includes("perdu") ? "bg-red-100 text-red-800" :
+                                                    "bg-yellow-100 text-yellow-800"}
+                `}
+                                        >
+                                            {result}
+                                        </motion.div>
+                                    ) : (
+                                        <div className="h-[60px]"></div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            <motion.div
+                                className="flex justify-center items-center gap-8 p-4 bg-gray-100 rounded-lg"
+                                initial={{opacity: 0}}
+                                animate={{opacity: 1}}
+                                transition={{delay: 0.3}}
+                            >
+                                <div className="text-center">
+                                    <div className="text-blue-600 font-bold">{playerName || "Vous"}</div>
+                                    <motion.div
+                                        key={playerScore}
+                                        initial={{scale: 1.5}}
+                                        animate={{scale: 1}}
+                                        className="text-3xl font-bold"
+                                    >
+                                        {playerScore}
+                                    </motion.div>
+                                </div>
+
+                                <div className="text-xl font-bold text-gray-400">VS</div>
+
+                                <div className="text-center">
+                                    <div className="text-red-600 font-bold">Robot</div>
+                                    <motion.div
+                                        key={opponentScore}
+                                        initial={{scale: 1.5}}
+                                        animate={{scale: 1}}
+                                        className="text-3xl font-bold"
+                                    >
+                                        {opponentScore}
+                                    </motion.div>
+                                </div>
+                            </motion.div>
+
+                            <motion.button
+                                onClick={resetScores}
+                                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 mx-auto transition-colors"
+                                whileHover={{scale: 1.05}}
+                                whileTap={{scale: 0.95}}
+                            >
+                                <FaRedo className="animate-spin-slow"/>
+                                Réinitialiser les scores
+                            </motion.button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
