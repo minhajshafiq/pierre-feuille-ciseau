@@ -86,8 +86,8 @@ export default function PierreFeuilleCiseaux() {
     };
 
     return (
-        <div className="min-h-screen w-full flex justify-center items-center">
-            <AnimatePresence mode="wait">
+        <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-b from-blue-500 to-purple-600 overflow-hidden sm:h-full">
+        <AnimatePresence mode="wait">
                 {!isNameSet ? (
                     <motion.div
                         key="login"
