@@ -179,25 +179,76 @@ export default function PierreFeuilleCiseaux() {
                                     {/* Animation Joueur */}
                                     <motion.div
                                         className="absolute left-1/4 transform -translate-x-1/2 bg-blue-500 text-white p-3 rounded-full"
-                                        initial={{y: -50}}
+                                        initial={{y: -50, scale: 0.8}}
                                         animate={showBounce ?
-                                            {y: [-20, 0, -15, 0, -10, 0], transition: {duration: 1.5}} :
-                                            {y: 0}
+                                            {
+                                                y: [-20, 0, -15, 0, -10, 0],
+                                                scale: [0.8, 1.2, 1],
+                                                transition: {duration: 1.5}
+                                            } : {y: 0, scale: 1}
                                         }
                                     >
-                                        {getIcon(playerChoice)}
+                                        <AnimatePresence mode="wait">
+                                            {showBounce ? (
+                                                <motion.div
+                                                    key="question"
+                                                    initial={{opacity: 1, rotate: 0}}
+                                                    animate={{rotate: [0, 10, -10, 0]}}
+                                                    exit={{opacity: 0, scale: 0}}
+                                                    transition={{duration: 0.1}}
+                                                    className="text-2xl font-bold"
+                                                >
+                                                    ?
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="choice"
+                                                    initial={{opacity: 0, scale: 0.5}}
+                                                    animate={{opacity: 1, scale: 1}}
+                                                    transition={{duration: 0.3}}
+                                                >
+                                                    {getIcon(playerChoice)}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </motion.div>
 
                                     {/* Animation Robot */}
                                     <motion.div
                                         className="absolute left-3/4 transform -translate-x-1/2 bg-red-500 text-white p-3 rounded-full"
-                                        initial={{y: -50}}
+                                        initial={{y: -50, scale: 0.8}}
                                         animate={showBounce ?
-                                            {y: [-20, 0, -15, 0, -10, 0], transition: {duration: 1.5}} :
-                                            {y: 0}
+                                            {
+                                                y: [-20, 0, -15, 0, -10, 0],
+                                                scale: [0.8, 1.2, 1],
+                                                rotate: [0, 5, -5, 0],
+                                                transition: {duration: 1.5}
+                                            } : {y: 0, scale: 1, rotate: 0}
                                         }
                                     >
-                                        {getIcon(opponentChoice)}
+                                        <AnimatePresence mode="wait">
+                                            {showBounce ? (
+                                                <motion.div
+                                                    key="question"
+                                                    initial={{opacity: 1, rotate: 0}}
+                                                    animate={{rotate: [0, -10, 10, 0]}}
+                                                    exit={{opacity: 0, scale: 0}}
+                                                    transition={{duration: 0.1}}
+                                                    className="text-2xl font-bold"
+                                                >
+                                                    ?
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="choice"
+                                                    initial={{opacity: 0, scale: 0.5}}
+                                                    animate={{opacity: 1, scale: 1}}
+                                                    transition={{duration: 0.3}}
+                                                >
+                                                    {getIcon(opponentChoice)}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </motion.div>
 
                                     {/* Animation Gagnant */}
